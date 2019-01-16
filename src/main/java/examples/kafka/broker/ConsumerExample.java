@@ -1,15 +1,6 @@
 
 package examples.kafka.broker;
 
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.Consumer;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
-
-import examples.kafka.models.DataRecord;
-import io.confluent.kafka.serializers.KafkaJsonDeserializerConfig;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,6 +9,12 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Properties;
+
+import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
 
 public class ConsumerExample {
 
@@ -34,23 +31,23 @@ public class ConsumerExample {
 
     // Add additional properties.
     props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
-    props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "io.confluent.kafka.serializers.KafkaJsonDeserializer");
-    props.put(KafkaJsonDeserializerConfig.JSON_VALUE_TYPE, DataRecord.class);
+    props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+
     props.put(ConsumerConfig.GROUP_ID_CONFIG, "some_example");
     props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
-    final Consumer<String, DataRecord> consumer = new KafkaConsumer<String, DataRecord>(props);
+    final Consumer<String, String> consumer = new KafkaConsumer<String, String>(props);
     consumer.subscribe(Arrays.asList(topic));
 
     Long total_count = 0L;
 
     try {
       while (true) {
-        ConsumerRecords<String, DataRecord> records = consumer.poll(Duration.ofMillis(1000));
-        for (ConsumerRecord<String, DataRecord> record : records) {
+        ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(1000));
+        for (ConsumerRecord<String, String> record : records) {
           String key = record.key();
-          DataRecord value = record.value();
-          total_count += value.getCount();
+          String value = record.value();
+          total_count += 1;
           System.out.printf("Consumed record with key %s and value %s, and updated total count to %d%n", key, value, total_count);
         }
       }

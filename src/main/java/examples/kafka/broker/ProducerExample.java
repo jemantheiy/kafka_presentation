@@ -1,30 +1,25 @@
 
 package examples.kafka.broker;
 
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.clients.producer.RecordMetadata;
-import org.apache.kafka.clients.producer.Callback;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.clients.producer.Producer;
-
-import org.apache.kafka.clients.admin.AdminClient;
-import org.apache.kafka.clients.admin.AdminClientConfig;
-import org.apache.kafka.clients.admin.NewTopic;
-
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-import org.apache.kafka.common.errors.TopicExistsException;
-
-import examples.kafka.models.DataRecord;
-
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Properties;
 import java.util.Collections;
-import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.ExecutionException;
+
+import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.clients.producer.Callback;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.common.errors.TopicExistsException;
+
 
 public class ProducerExample {
 
@@ -61,16 +56,16 @@ public class ProducerExample {
     props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
     props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "io.confluent.kafka.serializers.KafkaJsonSerializer");
 
-    Producer<String, DataRecord> producer = new KafkaProducer<String, DataRecord>(props);
+    Producer<String, String> producer = new KafkaProducer<String, String>(props);
 
     // Produce sample data
     final Long numMessages = 10L;
     for (Long i = 0L; i < numMessages; i++) {
       String key = "alice";
-      DataRecord record = new DataRecord(i);
+      String record = i.toString();
 
       System.out.printf("Producing record: %s\t%s%n", key, record);
-      producer.send(new ProducerRecord<String, DataRecord>(topic, key, record), new Callback() {
+      producer.send(new ProducerRecord<String, String>(topic, key, record), new Callback() {
           @Override
           public void onCompletion(RecordMetadata m, Exception e) {
             if (e != null) {
